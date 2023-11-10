@@ -5,8 +5,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Include your app's URL configurations
-    path('api/', include('transcription')),  # Replace 'your_app_name' with the name of your Django app
-    # ... other paths
+    path('api/', include('transcription.urls')),  # Replace 'your_app_name' with the name of your Django app
 ]
 
 # If you're using Django's authentication system, you might also have urlpatterns for it:

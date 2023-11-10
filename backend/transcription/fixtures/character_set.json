@@ -1,0 +1,10 @@
+[
+    {
+      "model": "transcription.characterset",
+      "pk": 1,
+      "fields": {
+        "characters": "()'aA-àÀ?âÂ,bB.cC;çÇ:dD!eEéÉèÈêÊëfFgGhHiIîÎïjJkKlLmMnNoOôÔpPqQrRsStTuUùûvVwWxXyYzZ "
+      }
+    }
+  ]
+  

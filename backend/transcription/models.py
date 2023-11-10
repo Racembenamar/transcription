@@ -4,8 +4,18 @@ from django.contrib.auth.models import User
 class CharacterSet(models.Model):
     characters = models.TextField()
 
+    @staticmethod
+    def get_default_characters():
+        # Retrieve the first character set instance from the database
+        try:
+            return CharacterSet.objects.first().characters
+        except AttributeError:
+            # If there are no CharacterSet instances, you can return a default set
+            # or handle the case as you see fit.
+            return ""  # Returning an empty string as a placeholder
+
     def __str__(self):
-        return "CharacterSet"
+        return self.characters
 
 class AudioSegment(models.Model):
     audio_file = models.FileField(upload_to='audio/')
