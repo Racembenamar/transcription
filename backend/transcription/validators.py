@@ -1,5 +1,3 @@
-# validators.py
-
 import re
 from django.core.exceptions import ValidationError
 from .models import CharacterSet
@@ -12,19 +10,23 @@ def validate_transcription(value):
     if not all(char in character_set or char.isspace() for char in value):
         raise ValidationError('Invalid characters in transcription.')
 
-    # Check that capital letters are only used appropriately
-    if not re.match(r'^([A-Z][a-zàâçéèêëîïôûù]+|\b[A-Z]+\b)(\s[A-Z]?[a-zàâçéèêëîïôûù]+)*$', value):
-        raise ValidationError('Invalid use of capital letters.')
+    # Check that capital letters are allowed only as a first word letter or if all letters in the word are uppercase
+    words = value.split()
+    for word in words:
+        if word.isupper() or (word[0].isupper() and word[1:].islower()):
+            continue
+        else:
+            raise ValidationError('Invalid use of capital letters.')
 
-    # Check that there is at most one space between words
+    # Check that there is only zero or one space between two characters
     if '  ' in value:
         raise ValidationError('Multiple consecutive spaces are not allowed.')
 
-    # Check that punctuation is followed by a space and an uppercase letter, or is the end of text
-    if re.search(r'[\?\.!](?![\s$])', value):
+    # Check that characters ?.! are end of text or followed by one space and an uppercase character
+    if re.search(r'[?\.!](?![\s$])', value):
         raise ValidationError('Punctuation must be followed by a space or be at the end of the text.')
 
-    # Check that commas, semicolons, colons are followed by a space or are the end of text
+    # Check that characters ,;: are end of text or followed by one space
     if re.search(r'[,;:](?![\s$])', value):
         raise ValidationError('Commas, semicolons, and colons must be followed by a space or be at the end of the text.')
 
