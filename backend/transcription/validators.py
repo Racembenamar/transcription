@@ -10,24 +10,23 @@ def validate_transcription(value):
     if not all(char in character_set or char.isspace() for char in value):
         raise ValidationError('Invalid characters in transcription.')
 
-    # Check that capital letters are allowed only as a first word letter or if all letters in the word are uppercase
+    # Capital letters validation
     words = value.split()
     for word in words:
-        if word.isupper() or (word[0].isupper() and word[1:].islower()):
-            continue
-        else:
+        # Word should be all uppercase, all lowercase, or start with an uppercase followed by all lowercase
+        if not (word.isupper() or word.islower() or (word[0].isupper() and word[1:].islower())):
             raise ValidationError('Invalid use of capital letters.')
 
-    # Check that there is only zero or one space between two characters
+    # Only zero or one space between two characters
     if '  ' in value:
         raise ValidationError('Multiple consecutive spaces are not allowed.')
 
-    # Check that characters ?.! are end of text or followed by one space and an uppercase character
-    if re.search(r'[?\.!](?![\s$])', value):
-        raise ValidationError('Punctuation must be followed by a space or be at the end of the text.')
+    # Characters ?.! should be at end of text or followed by one space and an uppercase character
+    if re.search(r'[?\.!](?![\s$][A-Z])', value) and not re.search(r'[?\.!]$', value):
+        raise ValidationError('Punctuation ?.! must be followed by a space and an uppercase character or be at the end of the text.')
 
-    # Check that characters ,;: are end of text or followed by one space
-    if re.search(r'[,;:](?![\s$])', value):
+    # Characters ,;: should be at end of text or followed by one space
+    if re.search(r'[,;:](?!\s)', value) and not re.search(r'[,;:]$', value):
         raise ValidationError('Commas, semicolons, and colons must be followed by a space or be at the end of the text.')
 
     return value

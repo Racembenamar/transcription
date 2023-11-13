@@ -48,7 +48,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -135,20 +134,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
+     'DEFAULT_PERMISSION_CLASSES': [
+         'rest_framework.permissions.IsAuthenticated',
+     ],
 }
 
 CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.15:8080",
-    # Add other origins as needed
 ]
 
-# Optional: Allow cookies and authentication headers (if needed)
 CORS_ALLOW_CREDENTIALS = True
-
-# Optional: Define which HTTP methods and headers are allowed
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -157,5 +152,4 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-
-
+CORS_ALLOW_ALL_ORIGINS = True

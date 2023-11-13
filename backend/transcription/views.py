@@ -4,18 +4,37 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate, login, logout
-
+from rest_framework.permissions import IsAuthenticated
 from .models import AudioSegment, CharacterSet
 from .serializers import AudioSegmentSerializer, CharacterSetSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import UserRegistrationSerializer
+
+class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]  # Allow anyone to access this view
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         username = request.data.get("username")
         password = request.data.get("password")
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
-            return Response({"success": "User logged in"}, status=status.HTTP_200_OK)
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"success": "User logged in", "token": token.key})
         else:
             return Response({"error": "Wrong Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -69,15 +88,10 @@ class AudioSegmentListCreateView(generics.ListCreateAPIView):
     serializer_class = AudioSegmentSerializer
 
 class AudioSegmentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = AudioSegment.objects.all()
     serializer_class = AudioSegmentSerializer
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-# Add any additional views you may have below
+    
+    def get_serializer_context(self):
+        context = super(AudioSegmentRetrieveUpdateView, self).get_serializer_context()
+        return context
