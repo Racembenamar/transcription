@@ -4,6 +4,11 @@ from .validators import validate_transcription
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+class AudioFileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AudioSegment
+        fields = ['audio_file']
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

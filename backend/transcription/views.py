@@ -13,7 +13,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegistrationSerializer
+from .serializers import AudioFileUploadSerializer
+from rest_framework.permissions import BasePermission
 
+class IsTranscriber(permissions.BasePermission):
+    """
+    Custom permission to only allow users in the 'Transcribers' group.
+    """
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name='Transcribers').exists()
+     
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]  # Allow anyone to access this view
 
@@ -24,6 +33,16 @@ class UserRegistrationView(APIView):
             return Response({"success": "User registered successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AudioFileUploadView(APIView):
+    permission_classes = [IsAuthenticated]  # Add custom permission
+
+    def post(self, request, format=None):
+        serializer = AudioFileUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -31,10 +50,20 @@ class LoginView(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         user = authenticate(username=username, password=password)
+
         if user:
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)
-            return Response({"success": "User logged in", "token": token.key})
+
+            is_transcriber = user.groups.filter(name='Transcribers').exists()
+            is_audio_uploader = user.groups.filter(name='Simple User').exists()
+
+            return Response({
+                "success": "User logged in", 
+                "token": token.key,
+                "is_transcriber": is_transcriber,
+                "is_audio_uploader": is_audio_uploader
+            })
         else:
             return Response({"error": "Wrong Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -59,6 +88,10 @@ class AudioSegmentViewSet(viewsets.ModelViewSet):
         fields = '__all__'
 
     def create(self, request, *args, **kwargs):
+        # Check if the user belongs to a specific group (e.g., 'AudioUploaders')
+        if not request.user.groups.filter(name='AudioUploaders').exists():
+            return Response({"error": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -66,10 +99,14 @@ class AudioSegmentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_update(self, serializer):
+        user = self.request.user
+        if not user.groups.filter(name='Transcribers').exists():
+            raise serializers.ValidationError("Not authorized to transcribe")
+
         if 'transcribed_text' in serializer.validated_data:
             transcribed_text = serializer.validated_data['transcribed_text']
             serializer.instance.transcribed_text = transcribed_text
-        serializer.instance.save()
+            serializer.instance.save()
 
     def get_queryset(self):
         queryset = AudioSegment.objects.all()
@@ -88,7 +125,7 @@ class AudioSegmentListCreateView(generics.ListCreateAPIView):
     serializer_class = AudioSegmentSerializer
 
 class AudioSegmentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTranscriber]
     queryset = AudioSegment.objects.all()
     serializer_class = AudioSegmentSerializer
     
