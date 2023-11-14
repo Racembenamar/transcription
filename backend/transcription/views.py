@@ -16,6 +16,12 @@ from .serializers import UserRegistrationSerializer
 from .serializers import AudioFileUploadSerializer
 from rest_framework.permissions import BasePermission
 
+class TranscribedAudioListView(APIView):
+    def get(self, request, format=None):
+        transcribed_audios = AudioSegment.objects.filter(is_transcribed=True)
+        serializer = AudioSegmentSerializer(transcribed_audios, many=True)
+        return Response(serializer.data)
+    
 class IsTranscriber(permissions.BasePermission):
     """
     Custom permission to only allow users in the 'Transcribers' group.

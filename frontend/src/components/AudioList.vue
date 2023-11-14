@@ -1,18 +1,23 @@
 <template>
   <v-container class="full-height-container">
     <div class="header">
+      
+    
       <h1>Available Audio Segments</h1>
       <v-btn @click="logout"  class="logout-button">Logout</v-btn>
     </div>
     <br> 
+
+
+    <v-btn @click="goToTranscribedList" color="info">Consult Transcribed Audio List</v-btn>
+
     <br> 
-<br> 
+    <br> 
 
     <v-btn  :to="{ name: 'AudioUpload' }">Upload Audio</v-btn>
 <br> <br> 
-<br> 
 
-    <table class="center-text">
+    <table class="center-text spaced-columns">
       <thead>
         <tr>
           <th class="center-text">Audio Name</th>
@@ -69,7 +74,10 @@ export default {
     logout() {
       localStorage.removeItem('userToken');
       this.$router.push('/login');
-    }
+    },
+    goToTranscribedList() {
+    this.$router.push({ name: 'TranscribedAudioList' }); // Use the correct route name
+  }
   }
 };
 </script>
@@ -104,5 +112,8 @@ html, body {
   margin-left: auto;
 }
 
-
+.spaced-columns td {
+  padding-left: 100%;
+  padding-right: 100%;
+}
 </style>

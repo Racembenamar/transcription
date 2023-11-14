@@ -2,9 +2,9 @@
   <div class="full-height-container">
     <div class="header">
       <v-btn @click="goBack" class="back-button">Back to List</v-btn>
-      <h1>Upload Audio</h1>
       <v-btn @click="logout" class="logout-button">Logout</v-btn>
     </div>
+    <h1>Upload Audio</h1>
 
     <form @submit.prevent="uploadAudio" class="upload-form">
       <v-file-input
@@ -13,8 +13,9 @@
         accept="audio/*"
         clearable
       ></v-file-input>
-      <v-btn type="submit" color="primary">Upload</v-btn>
-    </form>
+      <div class="button-container">
+        <v-btn type="submit" color="primary">Upload</v-btn>
+      </div>    </form>
     <p v-if="successMessage">{{ successMessage }}</p>
     <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
@@ -94,6 +95,12 @@ html, body {
   align-items: center;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; 
+  }
+
 .header {
   width: 100%;
   display: flex;
@@ -114,7 +121,7 @@ html, body {
   text-align: center;
 }
 
-.spaced-columns td {
+.spaced-columns th {
   padding-left: 20px;
   padding-right: 20px;
 }

@@ -2,10 +2,11 @@
   <div class="full-height-container">
     <div class="header">
       <v-btn @click="goBack" class="back-button">Back to List</v-btn>
-      <h1>Transcribe Audio</h1>
       <v-btn @click="logout" class="logout-button">Logout</v-btn>
     </div>
-    
+    <h1>Transcribe Audio</h1>
+<br><br>
+
     <audio v-if="audioUrl" controls :src="audioUrl"></audio>
 
     <v-form ref="form" class="transcription-form">
@@ -17,7 +18,9 @@
           v-model="transcription"
         ></v-textarea>
       </v-container>
-      <v-btn @click="validateAndSubmit" color="primary">Submit Transcription</v-btn>
+      <div class="button-container">
+        <v-btn @click="validateAndSubmit" color="primary">Submit Transcription</v-btn>
+      </div>
     </v-form>
 
     <v-snackbar v-model="showSnackbar">
@@ -192,4 +195,10 @@ html, body {
   padding-left: 20px;
   padding-right: 20px;
 }
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; 
+  }
 </style>

@@ -23,11 +23,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class AudioSegmentSerializer(serializers.ModelSerializer):
     transcribed_text = serializers.CharField(validators=[validate_transcription])
+    transcribed_by_username = serializers.SerializerMethodField()  
 
     class Meta:
         model = AudioSegment
-        fields = ['id', 'audio_file', 'transcribed_text', 'is_transcribed', 'transcribed_by']
-
+        fields = ['id', 'audio_file', 'transcribed_text', 'is_transcribed', 'transcribed_by', 'transcribed_by_username']
+    
+    def get_transcribed_by_username(self, obj):
+        return obj.transcribed_by.username if obj.transcribed_by else None
+    
     def update(self, instance, validated_data):
         user = self.context['request'].user
         if 'transcribed_text' in validated_data and not user.is_anonymous:
