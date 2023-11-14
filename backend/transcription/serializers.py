@@ -12,7 +12,7 @@ class AudioFileUploadSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']  # Add any other fields you need
+        fields = ['username', 'password', 'email'] 
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -37,10 +37,7 @@ class AudioSegmentSerializer(serializers.ModelSerializer):
         return super(AudioSegmentSerializer, self).update(instance, validated_data)
     
     def save(self, **kwargs):
-        # Get the user from the serializer context
         user = self.context['request'].user
-
-        # Check if user is authenticated
         if not user.is_anonymous:
             self.validated_data['transcribed_by'] = user
 

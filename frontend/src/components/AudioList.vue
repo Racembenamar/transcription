@@ -1,55 +1,53 @@
 <template>
-  <v-container>
-    <v-btn @click="logout" color="red" class="logout-button">Logout</v-btn> <!-- Vuetify Button for Logout -->
+  <v-container class="full-height-container">
+    <div class="header">
+      <h1>Available Audio Segments</h1>
+      <v-btn @click="logout"  class="logout-button">Logout</v-btn>
+    </div>
+    <br> 
+    <br> 
+<br> 
 
-    <h1>Available Audio Segments</h1>
-    <v-btn color="primary" :to="{ name: 'AudioUpload' }">Upload Audio</v-btn> <!-- Vuetify Button for Upload -->
+    <v-btn  :to="{ name: 'AudioUpload' }">Upload Audio</v-btn>
+<br> <br> 
+<br> 
 
-    <v-list>
-      <v-list-item-group>
-        <v-list-item v-for="audio in audioList" :key="audio.id">
-          <v-list-item-content>
-            Audio {{ audio.id }}
-            <!-- Audio player for each audio -->
-            <audio controls :src="audio.audioUrl"></audio>
-            <v-btn v-if="isTranscriber" @click="goToTranscriptionForm(audio.id)" small color="success">Add Transcription</v-btn>
-          </v-list-item-content>
-          <v-divider></v-divider>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
+    <table class="center-text">
+      <thead>
+        <tr>
+          <th class="center-text">Audio Name</th>
+          <th class="center-text">Player</th>
+          <th class="center-text" v-if="isTranscriber">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="center-text">
+        <tr v-for="(audio, index) in audioList" :key="audio.id">
+          <td>Audio {{ index + 1 }}</td>
+          <td><audio controls :src="audio.audio_file"></audio></td>
+          <td v-if="isTranscriber">
+            <v-btn @click="goToTranscriptionForm(audio.id)" small>Edit Transcription</v-btn>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </v-container>
 </template>
-
-
-
 
 <script>
 export default {
   data() {
     return {
-      audioList: [],
-      isTranscriber: false
+      audioList: [], 
+      isTranscriber: false 
     };
   },
   mounted() {
-    // Retrieve user role information from local storage
     this.isTranscriber = localStorage.getItem('isTranscriber') === 'true';
-
-    // Check for user authentication token
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      // Redirect to unauthorized page if not logged in
-      this.$router.push({ name: 'unauthorized' });
-    } else {
-      // Fetch audio segments if logged in
-      this.fetchAudioSegments();
-    }
+    this.fetchAudioSegments(); 
   },
   methods: {
     fetchAudioSegments() {
       const token = localStorage.getItem('userToken');
-      // Fetch audio segments from the server
       fetch('http://127.0.0.1:8000/api/audio_segments/?is_transcribed=false', {
         headers: {
           'Authorization': `Token ${token}`
@@ -57,20 +55,18 @@ export default {
       })
       .then(response => response.json())
       .then(data => {
-        this.audioList = data;
+        this.audioList = data.map((item, index) => {
+          return { ...item, name: `Audio ${index + 1}` }; 
+        });
       })
       .catch(error => {
         console.error('Error fetching audio segments:', error);
       });
     },
-    
     goToTranscriptionForm(audioId) {
-      // Navigate to the transcription form
       this.$router.push({ name: 'TranscriptionForm', params: { audioId } });
     },
-    
     logout() {
-      // Clear the user token and redirect to the login page
       localStorage.removeItem('userToken');
       this.$router.push('/login');
     }
@@ -79,14 +75,34 @@ export default {
 </script>
 
 <style>
-.logout-button {
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  cursor: pointer;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
-/* Add additional styling as needed */
+.full-height-container {
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logout-button {
+  margin-left: auto;
+}
+
+
 </style>

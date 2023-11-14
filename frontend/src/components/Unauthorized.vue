@@ -18,13 +18,11 @@
   
   <style>
   .unauthorized-container {
-    /* Add styles for the container */
     text-align: center;
     padding: 50px;
   }
   
   .unauthorized-container button {
-    /* Style for the login button */
     padding: 10px 20px;
     margin-top: 20px;
     cursor: pointer;

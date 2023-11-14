@@ -1,13 +1,35 @@
 <template>
-  <div>
-    <h1>Login</h1>
-    <form @submit.prevent="login">
-      <input type="text" v-model="username" placeholder="Username">
-      <input type="password" v-model="password" placeholder="Password">
-      <button type="submit">Login</button>
-    </form>
-    <p v-if="errorMessage">{{ errorMessage }}</p>
-  </div>
+  <v-container class="full-height-container">
+    <v-row justify="center">
+      <v-col cols="12" md="6" lg="4">
+        <v-card class="pa-4">
+          <v-form @submit.prevent="login">
+            <v-text-field
+              label="Username"
+              v-model="username"
+              outlined
+              dense
+              required
+            ></v-text-field>
+
+            <v-text-field
+              label="Password"
+              v-model="password"
+              type="password"
+              outlined
+              dense
+              required
+            ></v-text-field>
+
+            <v-btn type="submit" color="primary" block>Login</v-btn>
+            <v-btn @click="goToRegister" color="secondary" block class="mt-3">Register</v-btn>
+
+          </v-form>
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -38,8 +60,8 @@ export default {
       .then(data => {
         if (data.token) {
             localStorage.setItem('userToken', data.token);
-            localStorage.setItem('isTranscriber', data.is_transcriber); // Store the transcriber status
-            localStorage.setItem('isAudioUploader', data.is_audio_uploader); // Store the user role
+            localStorage.setItem('isTranscriber', data.is_transcriber); 
+            localStorage.setItem('isAudioUploader', data.is_audio_uploader); 
 
             this.$router.push('/');
         } else {
@@ -50,7 +72,33 @@ export default {
         console.error('Login error:', error);
         this.errorMessage = 'Login error: ' + error.message;
       });
+    },
+    goToRegister() {
+      this.$router.push('/register'); 
     }
   }
 };
 </script>
+
+
+
+<style>
+
+.full-height-container {
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.justify-center {
+  width: 100%;
+}
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+</style>

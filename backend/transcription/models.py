@@ -11,13 +11,10 @@ class CharacterSet(models.Model):
 
     @staticmethod
     def get_default_characters():
-        # Retrieve the first character set instance from the database
         try:
             return CharacterSet.objects.first()
         except CharacterSet.DoesNotExist:
-            # If there are no CharacterSet instances, you can return a default set
-            # or handle the case as you see fit.
-            return None  # Returning None when no instances are found
+            return None  
             
     def __str__(self):
         return self.characters

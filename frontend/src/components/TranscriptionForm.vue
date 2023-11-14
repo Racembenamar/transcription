@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <button @click="goBack" class="back-button">Back to List</button>
-    <button @click="logout" class="logout-button">Logout</button>
-
-    <h1>Transcribe Audio</h1>
+  <div class="full-height-container">
+    <div class="header">
+      <v-btn @click="goBack" class="back-button">Back to List</v-btn>
+      <h1>Transcribe Audio</h1>
+      <v-btn @click="logout" class="logout-button">Logout</v-btn>
+    </div>
+    
     <audio v-if="audioUrl" controls :src="audioUrl"></audio>
 
-    <v-form ref="form"> <!-- Add ref for form validation -->
+    <v-form ref="form" class="transcription-form">
       <v-container fluid>
         <v-textarea
           counter
@@ -20,13 +22,11 @@
 
     <v-snackbar v-model="showSnackbar">
       {{ snackbarMessage }}
-      <v-btn color="red" text @click="showSnackbar = false">Close</v-btn>
     </v-snackbar>
 
     <p v-if="processing">Processing...</p>
   </div>
 </template>
-
 
 
 
@@ -46,7 +46,7 @@ export default {
       rules: [v => v.length <= 1000 || 'Max 1000 characters'],
       showSnackbar: false,
       snackbarMessage: '',
-      textAreaRules: [v => v.length <= 1000 || 'Max 1000 characters'], // Define your rules here
+      textAreaRules: [v => v.length <= 1000 || 'Max 1000 characters'], 
 
     };
   },
@@ -54,7 +54,6 @@ export default {
   const audioId = parseInt(this.$route.params.audioId, 10);
   if (isNaN(audioId)) {
     console.error('Invalid audioId:', this.$route.params.audioId);
-    // Optionally redirect to a different page if the audioId is invalid
   } else {
     const token = localStorage.getItem('userToken');
     if (!token) {
@@ -69,33 +68,31 @@ export default {
 
   methods: {
     fetchAudioData(audioId) {
-    const token = localStorage.getItem('userToken'); // Retrieve the token from storage
+    const token = localStorage.getItem('userToken'); 
 
     fetch(`http://127.0.0.1:8000/api/audio_segments/${audioId}`, {
       headers: {
-        'Authorization': `Token ${token}`,  // Include the token in the request header
+        'Authorization': `Token ${token}`,  
         'Content-Type': 'application/json',
       }
     })
     
   .then(response => {
     if (!response.ok) {
-      // If the response is not OK, throw an error to be caught in the catch block
       throw new Error('Network response was not ok');
     }
-    return response.json(); // Parse the JSON response
+    return response.json(); 
   })
   .then(data => {
-    this.audioUrl = data.audio_file; // Set the audio URL
+    this.audioUrl = data.audio_file; 
   })
   .catch(error => {
     console.error('Error fetching audio data:', error);
-    // Handle errors here, such as displaying an error message
   });
   },
 
   validateAndSubmit() {
-      if (this.$refs.form.validate()) { // Use ref to validate form
+      if (this.$refs.form.validate()) { 
         this.submitTranscription();
       }
     },
@@ -123,7 +120,6 @@ export default {
         this.transcription = '';
       } else {
         return response.json().then(data => {
-          // Extracting the error message from the array
           this.snackbarMessage = data.transcribed_text.join(', ') || 'An error occurred while submitting the transcription.';
           this.showSnackbar = true;
         });
@@ -143,11 +139,11 @@ export default {
   },
 },
 logout() {
-      localStorage.removeItem('userToken');  // Clear the token
-      this.$router.push('/login');           // Redirect to the login page
+      localStorage.removeItem('userToken');  
+      this.$router.push('/login');           
     },
     goBack() {
-      this.$router.push('/'); // Assuming the root path ('/') is your audio list
+      this.$router.push('/'); 
     },
 
   }
@@ -155,25 +151,45 @@ logout() {
 </script>
 
 <style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.full-height-container {
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transcription-form {
+  margin-top: 20px;
+  width: 100%;
+}
+
 .logout-button {
-  /* Styling for the logout button */
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  cursor: pointer;
+  margin: 0;
 }
 
 .back-button {
-  /* Styling for the back button */
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
+  margin: 0;
 }
 
-/* Add other CSS styling as needed */
+.spaced-columns td {
+  padding-left: 20px;
+  padding-right: 20px;
+}
 </style>

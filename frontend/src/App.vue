@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div id="app">
-      <router-view></router-view> <!-- This will render the component based on the route -->
+      <router-view></router-view> 
     </div>
   </v-app>
 </template>
@@ -12,6 +12,3 @@ export default {
 }
 </script>
 
-<style>
-/* Your existing styles */
-</style>

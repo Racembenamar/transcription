@@ -1,11 +1,12 @@
 <template>
-  <div>
-    <v-btn @click="goBack" class="back-button">Back to List</v-btn> <!-- Back Button -->
+  <div class="full-height-container">
+    <div class="header">
+      <v-btn @click="goBack" class="back-button">Back to List</v-btn>
+      <h1>Upload Audio</h1>
+      <v-btn @click="logout" class="logout-button">Logout</v-btn>
+    </div>
 
-    <v-btn @click="logout" class="logout-button">Logout</v-btn> <!-- Logout Button -->
-
-    <h1>Upload Audio File</h1>
-    <form @submit.prevent="uploadAudio">
+    <form @submit.prevent="uploadAudio" class="upload-form">
       <v-file-input
         label="File input"
         @change="handleFileChange"
@@ -19,23 +20,21 @@
   </div>
 </template>
 
-  
-  <script>
-  export default {
-    data() {
-      return {
-        audioFile: null,
-        successMessage: '',
-        errorMessage: '',
-        isAudioUploader: localStorage.getItem('isAudioUploader') === 'true'
-
-      };
+<script>
+export default {
+  data() {
+    return {
+      audioFile: null,
+      successMessage: '',
+      errorMessage: '',
+      isAudioUploader: localStorage.getItem('isAudioUploader') === 'true'
+    };
+  },
+  methods: {
+    handleFileChange(event) {
+      this.audioFile = event.target.files[0];
     },
-    methods: {
-      handleFileChange(event) {
-        this.audioFile = event.target.files[0];
-      },
-      uploadAudio() {
+    uploadAudio() {
       if (!this.audioFile) {
         this.errorMessage = 'Please select an audio file to upload.';
         return;
@@ -64,21 +63,59 @@
         console.error('Error:', error);
         this.errorMessage = `Upload error: ${error}`;
       });
-    
-
-      },
-      logout() {
-      localStorage.removeItem('userToken');  // Clear the token
-      this.$router.push('/login');           // Redirect to the login page
+    },
+    logout() {
+      localStorage.removeItem('userToken');
+      this.$router.push('/login');
     },
     goBack() {
-      this.$router.push('/'); // Assuming the root path ('/') is your audio list
-    },
+      this.$router.push('/');
     }
-  };
-  </script>
-  
-  <style>
-  /* Add styles for your form, buttons, messages here */
-  </style>
-  
+  }
+};
+</script>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.full-height-container {
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upload-form {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.logout-button, .back-button {
+  margin: 0;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.spaced-columns td {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+</style>

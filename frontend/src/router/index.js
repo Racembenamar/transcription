@@ -20,11 +20,10 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guard should be defined after initializing the router
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken');
   const isAudioUploader = localStorage.getItem('isAudioUploader') === 'true';
-  const isTranscriber = localStorage.getItem('isTranscriber') === 'true'; // Get transcriber status
+  const isTranscriber = localStorage.getItem('isTranscriber') === 'true'; 
 
   if (to.matched.some(record => record.meta.requiresAudioUploader)) {
     if (!token || !isAudioUploader) {

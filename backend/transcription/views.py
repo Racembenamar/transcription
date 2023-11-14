@@ -24,7 +24,7 @@ class IsTranscriber(permissions.BasePermission):
         return request.user.groups.filter(name='Transcribers').exists()
      
 class UserRegistrationView(APIView):
-    permission_classes = [AllowAny]  # Allow anyone to access this view
+    permission_classes = [AllowAny] 
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -34,7 +34,7 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AudioFileUploadView(APIView):
-    permission_classes = [IsAuthenticated]  # Add custom permission
+    permission_classes = [IsAuthenticated]  
 
     def post(self, request, format=None):
         serializer = AudioFileUploadSerializer(data=request.data)
@@ -88,7 +88,6 @@ class AudioSegmentViewSet(viewsets.ModelViewSet):
         fields = '__all__'
 
     def create(self, request, *args, **kwargs):
-        # Check if the user belongs to a specific group (e.g., 'AudioUploaders')
         if not request.user.groups.filter(name='AudioUploaders').exists():
             return Response({"error": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
 
