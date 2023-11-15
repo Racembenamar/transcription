@@ -13,7 +13,7 @@ const routes = [
   { path: '/login/', component: UserLogin, name: 'login' },
   { path: '/register', component: UserRegister },
   { path: '/unauthorized', component: Unauthorized, name: 'unauthorized' },
-  { path: '/upload', name: 'AudioUpload', component: AudioUpload, meta: { requiresAuth: true, requiresAudioUploader: true } },
+  { path: '/upload', name: 'AudioUpload', component: AudioUpload, meta: { requiresAuth: true } },
   { path: '/transcribed-audios', component: TranscribedAudioList, name: 'TranscribedAudioList', meta: { requiresAuth: true } },
 ];
 
