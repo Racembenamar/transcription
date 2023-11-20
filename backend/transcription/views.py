@@ -23,9 +23,6 @@ class TranscribedAudioListView(APIView):
         return Response(serializer.data)
     
 class IsTranscriber(permissions.BasePermission):
-    """
-    Custom permission to only allow users in the 'Transcribers' group.
-    """
     def has_permission(self, request, view):
         return request.user.groups.filter(name='Transcribers').exists()
      
