@@ -1,6 +1,9 @@
 <template>
   <v-container class="full-height-container">
-    <v-row justify="center">
+    <br><br>
+    <h1>Hey there !</h1>
+    <br><br>
+      <v-row justify="center">
       <v-col cols="12" md="6" lg="4">
         <v-card class="pa-4">
           <v-form @submit.prevent="login">
@@ -11,7 +14,6 @@
               dense
               required
             ></v-text-field>
-
             <v-text-field
               label="Password"
               v-model="password"
@@ -20,10 +22,8 @@
               dense
               required
             ></v-text-field>
-
             <v-btn type="submit" color="primary" block>Login</v-btn>
             <v-btn @click="goToRegister" color="secondary" block class="mt-3">Register</v-btn>
-
           </v-form>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </v-card>
@@ -39,7 +39,6 @@ export default {
       username: '',
       password: '',
       errorMessage: '',
-      isAudioUploader: localStorage.getItem('isAudioUploader') === 'true'
     };
   },
   methods: {
@@ -60,8 +59,8 @@ export default {
       .then(data => {
         if (data.token) {
             localStorage.setItem('userToken', data.token);
-            localStorage.setItem('isTranscriber', data.is_transcriber); 
-            localStorage.setItem('isAudioUploader', data.is_audio_uploader); 
+            localStorage.setItem('is_transcriber', data.is_transcriber); 
+            localStorage.setItem('is_simple_user', data.is_simple_user); 
 
             this.$router.push('/');
         } else {
@@ -73,6 +72,7 @@ export default {
         this.errorMessage = 'Login error: ' + error.message;
       });
     },
+    
     goToRegister() {
       this.$router.push('/register'); 
     }
@@ -83,19 +83,20 @@ export default {
 
 
 <style>
-
 .full-height-container {
   height: 100%;
   min-height: 100vh;
   width: 100%;
-  padding: 20px;
+  padding: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .justify-center {
   width: 100%;
 }
+
 .error-message {
   color: red;
   text-align: center;

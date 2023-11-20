@@ -1,14 +1,12 @@
 <template>
-  <div class="full-height-container">
+  <v-container class="full-height-container">
     <div class="header">
       <v-btn @click="goBack" class="back-button">Back to List</v-btn>
       <v-btn @click="logout" class="logout-button">Logout</v-btn>
     </div>
     <h1>Transcribe Audio</h1>
 <br><br>
-
     <audio v-if="audioUrl" controls :src="audioUrl"></audio>
-
     <v-form ref="form" class="transcription-form">
       <v-container fluid>
         <v-textarea
@@ -22,13 +20,11 @@
         <v-btn @click="validateAndSubmit" color="primary">Submit Transcription</v-btn>
       </div>
     </v-form>
-
     <v-snackbar v-model="showSnackbar">
       {{ snackbarMessage }}
     </v-snackbar>
+</v-container>
 
-    <p v-if="processing">Processing...</p>
-  </div>
 </template>
 
 
@@ -54,20 +50,9 @@ export default {
     };
   },
   mounted() {
-  const audioId = parseInt(this.$route.params.audioId, 10);
-  if (isNaN(audioId)) {
-    console.error('Invalid audioId:', this.$route.params.audioId);
-  } else {
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      this.$router.push({ name: 'unauthorized' });
-    } else {
-      this.fetchAudioData(audioId);
-    }
-  }
-},
-
-
+  const audioId = parseInt(this.$route.params.audioId);
+  this.fetchAudioData(audioId);
+  },
 
   methods: {
     fetchAudioData(audioId) {
@@ -79,7 +64,6 @@ export default {
         'Content-Type': 'application/json',
       }
     })
-    
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -101,12 +85,6 @@ export default {
     },
 
     submitTranscription() {
-      if (!this.audioId) {
-      this.snackbarMessage = 'Audio ID is undefined.';
-      this.showSnackbar = true;
-      return;
-    }
-    this.processing = true;
     const token = localStorage.getItem('userToken');
     fetch(`http://127.0.0.1:8000/api/custom_audio_segments/${this.audioId}/`, {
       method: 'PATCH',
@@ -127,28 +105,17 @@ export default {
           this.showSnackbar = true;
         });
       }
-    })
-    .catch(error => {
-      this.snackbarMessage = 'Error submitting transcription.';
-      this.showSnackbar = true;
-    })
-    .finally(() => {
-      this.processing = false;
     });
   },
-    watch: {
-  audioId(newVal, oldVal) {
-    console.log('audioId changed from', oldVal, 'to', newVal);
-  },
-},
-logout() {
+
+    logout() {
       localStorage.removeItem('userToken');  
       this.$router.push('/login');           
     },
+  
     goBack() {
       this.$router.push('/'); 
     },
-
   }
 };
 </script>

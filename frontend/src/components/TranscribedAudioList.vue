@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       transcribedAudios: [],
-      baseUrl: 'http://127.0.0.1:8000' // Add your server base URL here
+      baseUrl: 'http://127.0.0.1:8000'
     };
   },
   mounted() {
@@ -51,7 +51,7 @@ export default {
         this.transcribedAudios = data.map(audio => {
           return {
             ...audio,
-            audio_file: this.baseUrl + audio.audio_file // Prepend base URL
+            audio_file: this.baseUrl + audio.audio_file
           };
         });
       })
@@ -59,10 +59,12 @@ export default {
         console.error('Error fetching transcribed audios:', error);
       });
     },
+
     logout() {
       localStorage.removeItem('userToken');
       this.$router.push('/login');
     },
+    
     goBack() {
       this.$router.go(-1);
     }
@@ -107,7 +109,7 @@ html, body {
 
 .title {
   text-align: center;
-  margin-top: 20px; /* Adjust the margin as needed */
+  margin-top: 20px; 
 }
 
 </style>

@@ -22,18 +22,18 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, next) => {
   const token = localStorage.getItem('userToken');
-  const isAudioUploader = localStorage.getItem('isAudioUploader') === 'true';
-  const isTranscriber = localStorage.getItem('isTranscriber') === 'true';
+  const is_transcriber = localStorage.getItem('is_transcriber') === 'true';
+  const is_simple_user = localStorage.getItem('is_simple_user') === 'true';
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!token) {
       next({ name: 'login' });
     } else {
-      if (to.matched.some(record => record.meta.requiresAudioUploader) && !isAudioUploader) {
+      if (to.matched.some(record => record.meta.requiresAudioUploader) && !is_simple_user) {
         next({ name: 'unauthorized' });
-      } else if (to.matched.some(record => record.meta.requiresTranscribers) && !isTranscriber) {
+      } else if (to.matched.some(record => record.meta.requiresTranscribers) && !is_transcriber) {
         next({ name: 'unauthorized' });
       } else {
         next();

@@ -16,16 +16,19 @@ from .serializers import UserRegistrationSerializer
 from .serializers import AudioFileUploadSerializer
 from rest_framework.permissions import BasePermission
 
-class TranscribedAudioListView(APIView):
-    def get(self, request, format=None):
-        transcribed_audios = AudioSegment.objects.filter(is_transcribed=True)
-        serializer = AudioSegmentSerializer(transcribed_audios, many=True)
-        return Response(serializer.data)
+
     
 class IsTranscriber(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name='Transcribers').exists()
-     
+ 
+class TranscribedAudioListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        transcribed_audios = AudioSegment.objects.filter(is_transcribed=True)
+        serializer = AudioSegmentSerializer(transcribed_audios, many=True)
+        return Response(serializer.data)
+
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny] 
 
@@ -49,7 +52,7 @@ class AudioFileUploadView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
         user = authenticate(username=username, password=password)
@@ -57,27 +60,26 @@ class LoginView(APIView):
         if user:
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)
-
             is_transcriber = user.groups.filter(name='Transcribers').exists()
-            is_audio_uploader = user.groups.filter(name='Simple User').exists()
+            is_simple_user = user.groups.filter(name='Simple User').exists()
 
             return Response({
                 "success": "User logged in", 
                 "token": token.key,
                 "is_transcriber": is_transcriber,
-                "is_audio_uploader": is_audio_uploader
+                "is_simple_user": is_simple_user
             })
         else:
             return Response({"error": "Wrong Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def logout_view(request):
-    logout(request)
-    return Response({"success": "User logged out"}, status=status.HTTP_200_OK)
-
 class AudioSegmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = AudioSegment.objects.all()
     serializer_class = AudioSegmentSerializer
+
+    class Meta:
+        model = AudioSegment
+        fields = '__all__'
 
     def validate_transcription(self, value):
         character_set = CharacterSet.get_default_characters()
@@ -85,20 +87,6 @@ class AudioSegmentViewSet(viewsets.ModelViewSet):
             return value
         else:
             raise serializers.ValidationError("Transcription contains invalid characters.")
-
-    class Meta:
-        model = AudioSegment
-        fields = '__all__'
-
-    def create(self, request, *args, **kwargs):
-        if not request.user.groups.filter(name='AudioUploaders').exists():
-            return Response({"error": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_update(self, serializer):
         user = self.request.user
@@ -111,26 +99,33 @@ class AudioSegmentViewSet(viewsets.ModelViewSet):
             serializer.instance.save()
 
     def get_queryset(self):
-        queryset = AudioSegment.objects.all()
-        is_transcribed = self.request.query_params.get('is_transcribed', None)
-        if is_transcribed is not None:
-            is_transcribed = is_transcribed.lower() in ['true', '1']
-            queryset = queryset.filter(is_transcribed=is_transcribed)
-        return queryset
-
+            queryset = AudioSegment.objects.all()
+            is_transcribed = self.request.query_params.get('is_transcribed', None)
+            if is_transcribed is not None:
+                is_transcribed = is_transcribed.lower() in ['true', '1']
+                queryset = queryset.filter(is_transcribed=is_transcribed)
+            return queryset
+            
 class CharacterSetViewSet(viewsets.ModelViewSet):
     queryset = CharacterSet.objects.all()
     serializer_class = CharacterSetSerializer
 
 class AudioSegmentListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = AudioSegment.objects.all()
     serializer_class = AudioSegmentSerializer
 
 class AudioSegmentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated, IsTranscriber]
+    permission_classes = [IsAuthenticated]
     queryset = AudioSegment.objects.all()
     serializer_class = AudioSegmentSerializer
     
     def get_serializer_context(self):
         context = super(AudioSegmentRetrieveUpdateView, self).get_serializer_context()
         return context
+
+
+@api_view(['POST'])
+def logout_view(request):
+    logout(request)
+    return Response({"success": "User logged out"}, status=status.HTTP_200_OK)

@@ -11,7 +11,6 @@
               dense
               required
             ></v-text-field>
-
             <v-text-field
               label="Email"
               v-model="email"
@@ -20,7 +19,6 @@
               dense
               required
             ></v-text-field>
-
             <v-text-field
               label="Password"
               v-model="password"
@@ -29,7 +27,6 @@
               dense
               required
             ></v-text-field>
-
             <v-btn type="submit" color="primary" block>Register</v-btn>
             <v-btn @click="goToLogin" color="secondary" block class="mt-3">Back to Login</v-btn>
           </v-form>

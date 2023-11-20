@@ -1,11 +1,11 @@
 <template>
-  <div class="full-height-container">
+  <v-container class="full-height-container">
     <div class="header">
       <v-btn @click="goBack" class="back-button">Back to List</v-btn>
       <v-btn @click="logout" class="logout-button">Logout</v-btn>
     </div>
-    <h1>Upload Audio</h1>
-
+    <h1 class="title">Upload Audio</h1>
+    <br><br>
     <form @submit.prevent="uploadAudio" class="upload-form">
       <v-file-input
         label="File input"
@@ -18,7 +18,11 @@
       </div>    </form>
     <p v-if="successMessage">{{ successMessage }}</p>
     <p v-if="errorMessage">{{ errorMessage }}</p>
-  </div>
+    <v-snackbar v-model="showSnackbar">
+      {{ snackbarMessage }}
+    </v-snackbar>
+  </v-container>
+
 </template>
 
 <script>
@@ -28,16 +32,21 @@ export default {
       audioFile: null,
       successMessage: '',
       errorMessage: '',
-      isAudioUploader: localStorage.getItem('isAudioUploader') === 'true'
+      isAudioUploader: localStorage.getItem('isAudioUploader') === 'true',
+      showSnackbar: false,
+      snackbarMessage: '',
+
     };
   },
   methods: {
     handleFileChange(event) {
       this.audioFile = event.target.files[0];
     },
+
     uploadAudio() {
       if (!this.audioFile) {
-        this.errorMessage = 'Please select an audio file to upload.';
+        this.snackbarMessage = 'Please select an audio file to upload.';
+        this.showSnackbar = true;
         return;
       }
 
@@ -53,22 +62,27 @@ export default {
       })
       .then(response => {
         if (!response.ok) {
+          
           return response.text().then(text => { throw new Error(text || 'Upload failed') });
         }
         return response.json();
       })
       .then(data => {
-        this.successMessage = 'Audio file uploaded successfully!';
+        this.snackbarMessage = 'Audio updated successfully !';
+        this.showSnackbar = true;
+
       })
       .catch(error => {
-        console.error('Error:', error);
-        this.errorMessage = `Upload error: ${error}`;
+        this.snackbarMessage = 'Faile to upload Audio';
+        this.showSnackbar = true;
       });
     },
+    
     logout() {
       localStorage.removeItem('userToken');
       this.$router.push('/login');
     },
+    
     goBack() {
       this.$router.push('/');
     }
@@ -88,7 +102,7 @@ html, body {
   height: 100%;
   min-height: 100vh;
   width: 100%;
-  margin: 0;
+  margin: auto;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -101,28 +115,32 @@ html, body {
     margin-top: 20px; 
   }
 
-.header {
-  width: 100%;
+  .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
-
 .upload-form {
   margin-top: 20px;
-  width: 100%;
+  width: 50%;
 }
 
-.logout-button, .back-button {
-  margin: 0;
+.logout-button {
+  margin-right: 100px;
+  margin-top: 80px;
+}
+
+.back-button {
+  margin-left: 100px;
+  margin-top: 80px;
+}
+
+.title {
+  text-align: center;
+  margin-top: 20px; 
 }
 
 .center-text {
   text-align: center;
-}
-
-.spaced-columns th {
-  padding-left: 20px;
-  padding-right: 20px;
 }
 </style>

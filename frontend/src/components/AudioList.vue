@@ -1,22 +1,14 @@
 <template>
   <v-container class="full-height-container">
     <div class="header">
-      
-    
       <h1>Available Audio Segments</h1>
       <v-btn @click="logout"  class="logout-button">Logout</v-btn>
     </div>
     <br> 
-
-
     <v-btn @click="goToTranscribedList" color="info">Consult Transcribed Audio List</v-btn>
-
-    <br> 
-    <br> 
-
+    <br> <br>  
     <v-btn  :to="{ name: 'AudioUpload' }">Upload Audio</v-btn>
-<br> <br> 
-
+    <br> <br> 
     <table class="center-text spaced-columns">
       <thead>
         <tr>
@@ -30,7 +22,7 @@
           <td>Audio {{ index + 1 }}</td>
           <td><audio controls :src="audio.audio_file"></audio></td>
           <td v-if="isTranscriber">
-            <v-btn @click="goToTranscriptionForm(audio.id)" small>Edit Transcription</v-btn>
+            <v-btn @click="goToTranscriptionForm(audio.id)" small>Add Transcription</v-btn>
           </td>
         </tr>
       </tbody>
@@ -68,16 +60,19 @@ export default {
         console.error('Error fetching audio segments:', error);
       });
     },
+
     goToTranscriptionForm(audioId) {
       this.$router.push({ name: 'TranscriptionForm', params: { audioId } });
     },
+
     logout() {
       localStorage.removeItem('userToken');
       this.$router.push('/login');
     },
+
     goToTranscribedList() {
-    this.$router.push({ name: 'TranscribedAudioList' }); // Use the correct route name
-  }
+    this.$router.push({ name: 'TranscribedAudioList' });
+    }
   }
 };
 </script>
@@ -95,7 +90,10 @@ html, body {
   min-height: 100vh;
   width: 100%;
   margin: 0;
-  padding: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .center-text {
