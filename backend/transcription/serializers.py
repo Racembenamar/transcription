@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import AudioSegment, CharacterSet
 from .validators import validate_transcription
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
 class AudioFileUploadSerializer(serializers.ModelSerializer):
@@ -19,12 +19,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
+        simple_user_group = Group.objects.get(name='Simple User')
+        user.groups.add(simple_user_group)
         return user
 
 class AudioSegmentSerializer(serializers.ModelSerializer):
     transcribed_text = serializers.CharField(validators=[validate_transcription])
     transcribed_by_username = serializers.SerializerMethodField()  
-
+ 
     class Meta:
         model = AudioSegment
         fields = ['id', 'audio_file', 'transcribed_text', 'is_transcribed', 'transcribed_by', 'transcribed_by_username']

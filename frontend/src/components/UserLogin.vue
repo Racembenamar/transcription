@@ -60,7 +60,6 @@ export default {
         if (data.token) {
             localStorage.setItem('userToken', data.token);
             localStorage.setItem('is_transcriber', data.is_transcriber); 
-            localStorage.setItem('is_simple_user', data.is_simple_user); 
 
             this.$router.push('/');
         } else {

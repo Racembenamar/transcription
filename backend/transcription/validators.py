@@ -3,6 +3,10 @@ from django.core.exceptions import ValidationError
 from .models import CharacterSet
 
 def validate_transcription(value):
+    # Reject inputs that are only spaces or specified punctuation
+    if re.fullmatch(r'[\s.,;:?!]*', value):
+        raise ValidationError('Transcription cannot be just punctuation or spaces.')
+
     # Get the allowed character set from the database
     character_set = CharacterSet.get_default_characters().characters
 

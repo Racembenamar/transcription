@@ -39,7 +39,7 @@ export default {
     };
   },
   mounted() {
-    this.isTranscriber = localStorage.getItem('isTranscriber') === 'true';
+    this.isTranscriber = localStorage.getItem('is_transcriber') === 'true';
     this.fetchAudioSegments(); 
   },
   methods: {

@@ -38,20 +38,21 @@ export default {
   mounted() {
     this.fetchTranscribedAudios();
   },
-  methods: {
+  methods: { 
     fetchTranscribedAudios() {
       const token = localStorage.getItem('userToken');
-      fetch(`${this.baseUrl}/api/transcribed_audios/`, {
+      fetch(`${this.baseUrl}/api/audio_segments/?is_transcribed=true`, { 
+
         headers: {
-          'Authorization': `Token ${token}`,
-        },
+          'Authorization': `Token ${token}`
+        }
       })
       .then(response => response.json())
       .then(data => {
         this.transcribedAudios = data.map(audio => {
           return {
             ...audio,
-            audio_file: this.baseUrl + audio.audio_file
+            audio_file:audio.audio_file
           };
         });
       })

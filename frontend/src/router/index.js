@@ -21,19 +21,15 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
-
-router.beforeEach((to, next) => {
+router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken');
   const is_transcriber = localStorage.getItem('is_transcriber') === 'true';
-  const is_simple_user = localStorage.getItem('is_simple_user') === 'true';
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!token) {
       next({ name: 'login' });
     } else {
-      if (to.matched.some(record => record.meta.requiresAudioUploader) && !is_simple_user) {
-        next({ name: 'unauthorized' });
-      } else if (to.matched.some(record => record.meta.requiresTranscribers) && !is_transcriber) {
+      if (to.matched.some(record => record.meta.requiresTranscribers) && !is_transcriber) {
         next({ name: 'unauthorized' });
       } else {
         next();
@@ -43,5 +39,6 @@ router.beforeEach((to, next) => {
     next();
   }
 });
+
 
 export default router;
